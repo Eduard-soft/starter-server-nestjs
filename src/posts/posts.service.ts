@@ -20,13 +20,13 @@ export class PostsService {
 		})
 	}
 
-	async createOne({ title, content, pictureUrl}: CreatePostDto, userId: number): Promise<Post> {
+	async createOne({ title, content}: CreatePostDto, userId: number): Promise<Post> {
 		const createPost = await this.prismaService.post.create({
 			data: {
 				title,
 				content,
 				userId,
-				pictureUrl
+				pictureUrl: "/starter-server-nestjs/src/public/default.png"
 			}
 		})
 
@@ -64,6 +64,10 @@ export class PostsService {
 			uniquePictureKey = `${Math.random()}-${file.originalname}`
 
 			await this.fileService.upload(uniquePictureKey, file.buffer)
+
+			if (post.pictureUrl) {
+				await this.fileService.delete(post.pictureUrl)
+			}
 		}
 
 		const updatedPost = await this.prismaService.post.update({
@@ -77,9 +81,6 @@ export class PostsService {
 		return updatedPost
 
 	}
-	// getOne(arg0: { id: number; }) {
-	// 	throw new Error('Method not implemented.');
-	// }
 
 	async deleteOne(id: number, userId: number) {
 		await this.getOneOrThrow(id, userId)

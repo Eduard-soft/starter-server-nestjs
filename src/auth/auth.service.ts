@@ -19,7 +19,7 @@ export class AuthService {
 		const createUser = await this.userService.createOne({
 			email,
 			hashedPassword,
-			avatarUrl
+			avatarUrl: "/starter-server-nestjs/src/public/default1.png"
 		})
 
 		return await this.generateTokens(createUser.id, res)

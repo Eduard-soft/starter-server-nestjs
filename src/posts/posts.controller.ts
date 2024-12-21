@@ -7,7 +7,10 @@ import { Body,
          ParseIntPipe, 
          Delete, 
          UseGuards,
-         UseInterceptors, UploadedFile
+         UseInterceptors, UploadedFile,
+         ParseFilePipe,
+         MaxFileSizeValidator,
+         FileTypeValidator
 } from '@nestjs/common';
 import { PostsService } from './posts.service'
 import { CreatePostDto } from './dtos/create-post.dto'
@@ -43,21 +46,20 @@ export class PostsController {
 	async updateOne(
 		@Param("id", ParseIntPipe) id: number,
 		@Body() dto: UpdatePostDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator ({ maxSize: 1000000}),
+          // new FileTypeValidator ({ fileType: "image/jpeg/jpg/png"})
+        ],
+        fileIsRequired: false
+      })
+    ) file: Express.Multer.File,
     @CurrentUser("id", ParseIntPipe) userId: number
   ): Promise<PostModel> {
 		return await this.postsService.updateOne(id, dto, userId, file)
 	}
 
-  // @Patch()
-  // @UseInterceptors(FileInterceptor('avatar'))
-  // async updateOne(
-  //   @CurrentUser("id", ParseIntPipe) userId: number,
-  //   @Body() dto: UpdateUserDto,
-  //   @UploadedFile() file: Express.Multer.File
-  // ) {
-  //   return await this.usersService.updateOne(userId, dto, file)
-  // }
 
 	@Delete(":id")
 	async deleteOne(
