@@ -6,7 +6,8 @@ import { Body,
          Param, 
          ParseIntPipe, 
          Delete, 
-         UseGuards
+         UseGuards,
+         UseInterceptors, UploadedFile
 } from '@nestjs/common';
 import { PostsService } from './posts.service'
 import { CreatePostDto } from './dtos/create-post.dto'
@@ -15,6 +16,7 @@ import { UpdatePostDto } from './dtos/update-post.dto'
 // import { Post as PrismaService } from '@prisma/client'
 import { JwtAccessGuard } from 'src/auth/guards/jwt-access.guard'
 import { CurrentUser } from 'src/utils/decorators/current-user.decorator'
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(JwtAccessGuard)
 @Controller('posts')
@@ -37,13 +39,25 @@ export class PostsController {
   }
 
   @Patch(":id")
+  @UseInterceptors(FileInterceptor('picture'))
 	async updateOne(
 		@Param("id", ParseIntPipe) id: number,
 		@Body() dto: UpdatePostDto,
+    @UploadedFile() file: Express.Multer.File,
     @CurrentUser("id", ParseIntPipe) userId: number
   ): Promise<PostModel> {
-		return await this.postsService.updateOne(id, dto, userId)
+		return await this.postsService.updateOne(id, dto, userId, file)
 	}
+
+  // @Patch()
+  // @UseInterceptors(FileInterceptor('avatar'))
+  // async updateOne(
+  //   @CurrentUser("id", ParseIntPipe) userId: number,
+  //   @Body() dto: UpdateUserDto,
+  //   @UploadedFile() file: Express.Multer.File
+  // ) {
+  //   return await this.usersService.updateOne(userId, dto, file)
+  // }
 
 	@Delete(":id")
 	async deleteOne(

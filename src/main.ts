@@ -1,7 +1,7 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core'
+import { AppModule } from './app.module'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { ValidationPipe } from '@nestjs/common'
 import * as cookieParser from 'cookie-parser'
 
 async function bootstrap() {
@@ -21,8 +21,6 @@ async function bootstrap() {
 
   app.use(cookieParser())
 
-  await app.listen(4000);
+  await app.listen(4000)
 }
-bootstrap();
-
-// Не работает RefreshToken 33minuta
+bootstrap()
