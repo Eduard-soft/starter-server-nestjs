@@ -8,11 +8,13 @@ datasource db {
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  picture   String[] @default(["Brown.png"])
-  published Boolean  @default(false)
+  id      Int    @id @default(autoincrement())
+  title   String
+  content String
+
+  pictureUrl String @map("picture_url")
+
+  published Boolean @default(false)
 
   userId Int  @map("user_id")
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -26,7 +28,10 @@ model Post {
 model User {
   id             Int     @id @default(autoincrement())
   email          String  @unique
-  hashedPassword String? @map("hashed_password")
+  hashedPassword String  @map("hashed_password")
+  firstName      String? @map("first_name")
+  lastName       String? @map("last_name")
+  avatarUrl      String  @map("avatar_url")
 
   posts Post[]
 

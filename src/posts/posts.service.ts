@@ -1,14 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { Post } from '@prisma/client';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { Post as PostModel } from '@prisma/client'
+import { FileService } from 'src/services/file.service';
+import { GetPostDto } from './dtos/get-post.dto';
 
 @Injectable()
 export class PostsService {
 
-	constructor( private readonly prismaService: PrismaService) {}
+	constructor( private readonly prismaService: PrismaService,
+							 private readonly fileService: FileService
+	) {}
 
 	async get(userId: number) {
 		return await this.prismaService.post.findMany({
@@ -16,28 +20,66 @@ export class PostsService {
 		})
 	}
 
-	async createOne({ title, content}: CreatePostDto, userId: number): Promise<Post> {
+	async createOne({ title, content, pictureUrl}: CreatePostDto, userId: number): Promise<Post> {
 		const createPost = await this.prismaService.post.create({
 			data: {
 				title,
 				content,
-				userId
+				userId,
+				pictureUrl
 			}
 		})
 
 		return createPost
 	}
 
-	async updateOne(id: number, dto: UpdatePostDto, userId: number) {
+	async getOne({ id }: GetPostDto) {
+		if (!id) {
+			throw new BadRequestException()
+		}
+
+		const user = await this.prismaService.user.findFirst({
+			where: { id }
+		})
+
+		return user
+	}
+
+	async updateOne(id: number, dto: UpdatePostDto, userId: number, file: Express.Multer.File) {
 		await this.getOneOrThrow(id, userId)
+
+		const post = await this.getOneOrThrow(id, userId)
+
+		if (id) {
+			const postById = await this.getOne({ id })
+
+			if (postById) {
+				throw new ConflictException("The user does not have such a post")
+			}
+		}
+
+		let uniquePictureKey = post.pictureUrl
+
+		if (file) {
+			uniquePictureKey = `${Math.random()}-${file.originalname}`
+
+			await this.fileService.upload(uniquePictureKey, file.buffer)
+		}
 
 		const updatedPost = await this.prismaService.post.update({
 			where: { id, userId },
-			data: dto
+			data: {
+				...dto,
+				pictureUrl: uniquePictureKey
+			}
 		})
 
 		return updatedPost
+
 	}
+	// getOne(arg0: { id: number; }) {
+	// 	throw new Error('Method not implemented.');
+	// }
 
 	async deleteOne(id: number, userId: number) {
 		await this.getOneOrThrow(id, userId)

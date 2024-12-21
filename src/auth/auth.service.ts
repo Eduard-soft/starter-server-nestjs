@@ -13,12 +13,13 @@ export class AuthService {
 							private readonly configService: ConfigService
 	) {}
 
-	async register( { email, password }: RegisterDto, res: Response) {
+	async register( { email, password, avatarUrl }: RegisterDto, res: Response) {
 		const hashedPassword = await hash(password)
 
 		const createUser = await this.userService.createOne({
 			email,
-			hashedPassword
+			hashedPassword,
+			avatarUrl
 		})
 
 		return await this.generateTokens(createUser.id, res)
