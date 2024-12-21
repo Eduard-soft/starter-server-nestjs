@@ -14,7 +14,7 @@ export class UsersService {
 	constructor( private readonly prismaService: PrismaService,
 							 private readonly fileService: FileService) {}
 
-	async createOne({ email, hashedPassword, avatarUrl}: CreateUserDto) {
+	async createOne({ email, hashedPassword}: CreateUserDto) {
 		const userByEmail = await this.prismaService.user.findUnique({ where: { email } })
 
 		if (userByEmail) {
@@ -25,10 +25,11 @@ export class UsersService {
 			data: {
 				email,
 				hashedPassword,
-				avatarUrl
+				avatarUrl: "/starter-server-nestjs/src/public/default1.png"
 				
 			}
 		})
+
 		return createUser
 	}
 
@@ -69,6 +70,10 @@ export class UsersService {
 			uniqueAvatarKey = `${Math.random()}-${file.originalname}`
 
 			await this.fileService.upload(uniqueAvatarKey, file.buffer)
+			
+			if (user.avatarUrl) {
+				await this.fileService.delete(user.avatarUrl)
+			}
 		}
 
 
@@ -80,7 +85,6 @@ export class UsersService {
 				avatarUrl: uniqueAvatarKey
 			}
 		})
-		console.log(updateUser)
 
 		return updateUser
 	}

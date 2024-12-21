@@ -8,6 +8,5 @@ export class UpdateUserDto {
 
 	password?: string
 
-	
 	avatarUrl?: string
 }
