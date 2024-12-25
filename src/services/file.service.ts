@@ -14,7 +14,7 @@ export class FileService {
 	async upload(key: string, buffer: Buffer) {
 		await this.s3Client.send(
 			new PutObjectCommand({
-				Bucket: "245800ef-ea2caf8e-b579-470b-8328-398c87b5f8b7",
+				Bucket:  this.configService.getOrThrow("AWS_BUCKET_NAME"),
 				Key: key,
 				Body: buffer
 			})
@@ -24,7 +24,7 @@ export class FileService {
 	async delete(key: string) {
 			await this.s3Client.send(
 				new DeleteObjectCommand({
-					Bucket: "245800ef-ea2caf8e-b579-470b-8328-398c87b5f8b7",
+					Bucket: this.configService.getOrThrow("AWS_BUCKET_NAME"),
 				  Key: key
 				})
 			)

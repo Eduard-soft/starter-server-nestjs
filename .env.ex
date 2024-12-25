@@ -2,7 +2,7 @@ NODE_ENV='development'
 
 APPLICATION_PORT=4000
 APPLICATION_URL='http://localhost:${APPLICATION_PORT}'
-ALLOWED_ORIGIN='http://localhost:3000'
+ALLOWED_ORIGIN='http://localhost:4000'
 
 POSTGRES_USER='postgres-admin'
 POSTGRES_PASSWORD='123456'
@@ -24,8 +24,11 @@ JWT_REFRESH_SECRET='refresh-secret'
 JWT_REFRESH_EXPIRES='7d'
 
 AWS_S3_REGION=#your region
-AWS_S3_ENTRYPOINT=#your entrypoint if different from AWS
-AWS_SECRET_ACCESS_KEY=#your secret access key
-AWS_ACCESS_KEY_ID=#your secret access key
+AWS_S3_ENTRYPOINT=#"your entry point if it differs from AWS"
+AWS_SECRET_ACCESS_KEY=#"your secret access key"
+AWS_ACCESS_KEY_ID=#"your access key"
+AWS_BUCKET_NAME=#"your bucket name"
 
+GOOGLE_CLIENT_ID=#"google client id"
+GOOGLE_CLIENT_SECRET=#"google client secret"
 

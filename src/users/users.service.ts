@@ -21,16 +21,16 @@ export class UsersService {
 			throw new ConflictException("User with is already existing")
 		}
 
-		const createUser = await this.prismaService.user.create({
+		const createdUser = await this.prismaService.user.create({
 			data: {
 				email,
 				hashedPassword,
-				avatarUrl: "/starter-server-nestjs/src/public/default1.png"
+				avatarUrl: "/starter-server-nestjs/src/public/default.png"
 				
 			}
 		})
 
-		return createUser
+		return createdUser
 	}
 
 	async getOne({ id, email }: GetUserDto) {
@@ -58,7 +58,7 @@ export class UsersService {
 		}
 
 		
-		let hashedPassword: string = user.hashedPassword
+		let hashedPassword = user.hashedPassword
 
 		if (dto.password) {
 			hashedPassword = await hash(dto.password)

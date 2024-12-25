@@ -13,40 +13,31 @@ export class AuthService {
 							private readonly configService: ConfigService
 	) {}
 
-	async register( { email, password, avatarUrl }: RegisterDto, res: Response) {
+	async register({ email, password }: RegisterDto, res: Response) {
 		const hashedPassword = await hash(password)
 
-		const createUser = await this.userService.createOne({
+		const createdUser = await this.userService.createOne({
 			email,
 			hashedPassword,
 			avatarUrl: "/starter-server-nestjs/src/public/default1.png"
 		})
 
-		return await this.generateTokens(createUser.id, res)
+		return await this.generateTokens(createdUser.id, res)
 	}
 
-		async validateUser(email: string, password: string) {
-			const userByEmail = await this.userService.getOne({ email })
+	async googleAuth(email: string, res: Response) {
+		const userByEmail = await this.userService.getOne({ email })
 
-			if (!userByEmail) {
-				return null
-			}
-
-			if (!userByEmail.hashedPassword) {
-				throw new BadRequestException(
-					"Probably you already have an account via google"
-				)
-			}
-	
-			const isValidPw = await verify(userByEmail.hashedPassword, password)
-	
-			if (!isValidPw) {
-				return null
-			}
-	
-			return userByEmail
+		if (userByEmail) {
+			return await this.generateTokens(userByEmail.id, res)
 		}
 
+		const createdUser = await this.userService.createOne({ email})
+
+		return await this.generateTokens(createdUser.id, res)
+	}
+
+	//privet methods
 	async generateTokens(userId: number, res: Response) {
 		const accessToken = await this.jwtService.signAsync(
 			{ userId },
@@ -70,5 +61,27 @@ export class AuthService {
 		})
 
 		return accessToken
+	}
+
+	async validateUser(email: string, password: string) {
+		const userByEmail = await this.userService.getOne({ email })
+
+		if (!userByEmail) {
+			return null
+		}
+
+		if (!userByEmail.hashedPassword) {
+			throw new BadRequestException(
+				"Probably you already have an account via google"
+			)
+		}
+
+		const isValidPw = await verify(userByEmail.hashedPassword, password)
+
+		if (!isValidPw) {
+			return null
+		}
+
+		return userByEmail
 	}
 }
