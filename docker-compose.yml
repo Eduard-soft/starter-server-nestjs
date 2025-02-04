@@ -1,6 +1,25 @@
 version: '3.9'
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+    ports:
+      - "${APPLICATION_PORT}:4000"
+    environment:
+      DATABASE_URL: 'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}'
+      REDIS_URL: redis
+    volumes:
+      - ./my-uploads:/usr/starter-server-nestjs/uploads
+    profiles:
+      - product
+
   db:
     container_name: postgres
     image: postgres:15.2

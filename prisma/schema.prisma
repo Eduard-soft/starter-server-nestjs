@@ -31,6 +31,7 @@ model User {
   hashedPassword String? @map("hashed_password")
   firstName      String? @map("first_name")
   lastName       String? @map("last_name")
+  isBlocked      Boolean @default(false) @map("is_blocked")
   avatarUrl      String  @map("avatar_url")
 
   posts Post[]

@@ -58,7 +58,7 @@ export class PostsService {
 			}
 		}
 
-		let uniquePictureKey = post.pictureUrl
+		let uniquePictureKey: string = post.pictureUrl
 
 		if (file) {
 			uniquePictureKey = `${Math.random()}-${file.originalname}`
