@@ -2,6 +2,8 @@ version: '3.9'
 
 services:
   app:
+    container_name: "starter_server_nestjs"
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,6 +15,7 @@ services:
     ports:
       - "${APPLICATION_PORT}:4000"
     environment:
+      PORT: ${PORT}
       DATABASE_URL: 'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}'
       REDIS_URL: redis
     volumes:
