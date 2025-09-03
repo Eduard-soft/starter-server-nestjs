@@ -1,24 +1,30 @@
 version: '3.9'
 
 services:
+
   app:
+    image: server-app
+    container_name: app
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
     depends_on:
       - db
       - redis
-    env_file:
-      - .env
-    ports:
-      - "${APPLICATION_PORT}:4000"
+    restart: unless-stopped
     environment:
       DATABASE_URL: 'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}'
       REDIS_URL: redis
     volumes:
-      - ./my-uploads:/usr/starter-server-nestjs/uploads
+      - my-uploads:/usr/starter-server-nestjs/uploads
     profiles:
       - product
+    networks:
+      - backend
 
   db:
     container_name: postgres
@@ -40,7 +46,7 @@ services:
     image: redis:5.0
     restart: always
     ports:
-      - 6379:6379
+      - 6380:6379
     command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
@@ -50,7 +56,70 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  my-uploads:
 
 networks:
   backend:
-  
+
+
+  #################
+
+# version: '3.8'
+
+# services:
+#   postgres:
+#     image: postgres:15-alpine
+#     container_name: docker-db
+#     environment:
+#       POSTGRES_HOST: ${POSTGRES_HOST}
+#       POSTGRES_DB: ${POSTGRES_DB}
+#       POSTGRES_USER: ${POSTGRES_USER}
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#     env_file:
+#       - .env
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+#       interval: 5s
+#       timeout: 5s
+#       retries: 5
+#     restart: unless-stopped
+#     networks:
+#       - docker-network
+
+#   app:
+#     build: .
+#     container_name: docker-app
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - .:/usr/src/app
+#       - /usr/src/app/node_modules
+#     environment:
+#       - NODE_ENV=production
+#       - PORT=3000
+#       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+#     env_file:
+#       - .env
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
+#     restart: always
+#     networks:
+#       - docker-network
+#     command: >
+#       sh -c "
+#         npm run prisma:generate &&
+#         npm run prisma:migrate:deploy &&
+#         node dist/main
+#       "
+
+# volumes:
+#   postgres_data:
+
+# networks:
+#   docker-network:
+#     driver: bridge
