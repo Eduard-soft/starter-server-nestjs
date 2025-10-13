@@ -1,15 +1,13 @@
-FROM node:20-alpine
+FROM node:22-alpine AS builder
 
-WORKDIR /app
-# Копируем package.json первым для кэширования зависимостей
+WORKDIR /usr/srs/app
+
 COPY package*.json ./
-# Устанавливаем зависимости
+
 RUN npm install --legacy-peer-deps
-# Копируем исходный код
+
 COPY . .
-# Собираем приложение
-RUN npm run build
 
-EXPOSE 3000
+EXPOSE 4000
 
-CMD ["npm", "run", "start:prod"]
+CMD ["node","main.js"]
