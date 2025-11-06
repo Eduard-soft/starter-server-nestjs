@@ -14,7 +14,7 @@ export class UsersService {
 	constructor( private readonly prismaService: PrismaService,
 							 private readonly fileService: FileService) {}
 
-	async createOne({ email, hashedPassword}: CreateUserDto) {
+	async createOne({ email, firstName, hashedPassword}: CreateUserDto) {
 		const userByEmail = await this.prismaService.user.findUnique({ where: { email } })
 
 		if (userByEmail) {
@@ -25,6 +25,7 @@ export class UsersService {
 			data: {
 				email,
 				hashedPassword,
+				firstName,
 				avatarUrl: "/starter-server-nestjs/src/public/default.png"
 				
 			}

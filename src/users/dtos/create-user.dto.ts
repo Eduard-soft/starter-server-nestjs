@@ -8,6 +8,8 @@ export class CreateUserDto {
 	// @IsString()
 	hashedPassword?: string
 
+	firstName?: string
+
 	@ApiProperty({
 		name: 'avatarUrl',
 		description: 'Link to the image of the post',

@@ -5,6 +5,7 @@ import { Body,
          Post, 
          Req, 
          Res, 
+         UnauthorizedException, 
          UseGuards 
         } from '@nestjs/common'
 import { AuthService } from './auth.service'
@@ -36,9 +37,18 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh')
   async refresh(
-    @CurrentUser('id', ParseIntPipe) userId: number,
+    @CurrentUser('id') userId: number,
+    @Req()req: any,
     @Res({ passthrough: true }) res: Response
   ) {
+
+    console.log('Refresh user:', userId);
+    console.log('Refresh cookies:', req.cookies);
+
+    if (!userId) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
       return await this.authService.generateTokens(userId, res)
   }
 
@@ -47,19 +57,19 @@ export class AuthController {
 		res.cookie("refreshToken", "")
 	}
 
-
-  //google auth
-  @UseGuards(GoogleGuard)
-  @Get("google")
-  google() {}
-
   @UseGuards(GoogleGuard)
   @Get("google/callback")
   async googleCallback(
-    @Req() req: Request & { user: { _json: { email: string } }},
+    @Req() req: any,
     @Res({ passthrough: true }) res: Response
   ) {
-    return await this.authService.googleAuth(req.user._json.email, res)
+    console.log('Request user:', req.user);
+  
+      if (!req.user || !req.user.email) {
+      throw new UnauthorizedException('Google authentication failed');
+    }
+
+    return await this.authService.googleAuth(req.user.email, req.user.firstName, res);
   }
 
 }

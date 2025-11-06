@@ -93,11 +93,16 @@ export class PostsService {
 
 		// Private methods
 		private async getOneOrThrow(id: number, userId?: number): Promise<PostModel> {
-			const post = await this.prismaService.post.findUnique({ where: { id } })
-	
-			if (!post) {
-				throw new NotFoundException("Could not find any post")
-			}
+			const post = await this.prismaService.post.findFirst({ 
+        where: { 
+            id,
+            ...(userId && { userId })
+        }
+    });
+
+    if (!post) {
+        throw new NotFoundException("Пост не найден или доступ запрещен")
+    }
 	
 			return post
 		}

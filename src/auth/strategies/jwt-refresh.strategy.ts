@@ -13,19 +13,27 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh"
 		private readonly usersService: UsersService
 	) {
 		super({
-				jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+				jwtFromRequest: ExtractJwt.fromExtractors([
+					(req: Request) => {
+						console.log('All cookies:', req.cookies)
+						return req.cookies?.refreshToken
+					}
+				]),
 				ignoreExpiration: false,
 				secretOrKey: configService.getOrThrow("JWT_REFRESH_SECRET")
 		})
 	}
 
-	async validate({ userId }: JwtPayload) {
-		const user = await this.usersService.getOne({ id: userId })
+	async validate(payload: JwtPayload) {
+		console.log('Refresh payload:', payload)
+		const user = await this.usersService.getOne({ id: payload.userId })
 
 		if (!user) {
-			throw new UnauthorizedException()
+			throw new UnauthorizedException('Юзер не найден')
 		}
 
-		return user
+		return { id: user.id,
+						userId: user.id,
+						email: user.email }
 	}
 }

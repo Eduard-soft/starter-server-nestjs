@@ -25,14 +25,14 @@ export class AuthService {
 		return await this.generateTokens(createdUser.id, res)
 	}
 
-	async googleAuth(email: string, res: Response) {
+	async googleAuth(email: string, firstName: string, res: Response) {
 		const userByEmail = await this.userService.getOne({ email })
 
 		if (userByEmail) {
 			return await this.generateTokens(userByEmail.id, res)
 		}
 
-		const createdUser = await this.userService.createOne({ email})
+		const createdUser = await this.userService.createOne({ email, firstName})
 
 		return await this.generateTokens(createdUser.id, res)
 	}
@@ -57,10 +57,12 @@ export class AuthService {
 
 		res.cookie("refreshToken", refreshToken, {
 			httpOnly: true,
-			secure: true
+			secure: true,
+			sameSite: 'lax',
+			maxAge: 7 * 24 * 60 * 60 * 1000
 		})
 
-		return accessToken
+		return { accessToken }
 	}
 
 	async validateUser(email: string, password: string) {

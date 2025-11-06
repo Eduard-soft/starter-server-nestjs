@@ -2,9 +2,17 @@ import { createParamDecorator, ExecutionContext } from "@nestjs/common"
 import { User } from "@prisma/client"
 
 export const CurrentUser = createParamDecorator(
-	(key: keyof User, ctx: ExecutionContext) => {
+	(data: keyof User | undefined, ctx: ExecutionContext) => {
 		const req = ctx.switchToHttp().getRequest()
 
-		return key ? req.user[key] : req.user
+    console.log('=== CurrentUser Decorator ===')
+    console.log('Data:', data)
+    console.log('Request user:', req.user)
+    
+    if (!req.user) {
+      return null
+    }
+    
+    return data ? req.user[data] : req.user
 	}
 )

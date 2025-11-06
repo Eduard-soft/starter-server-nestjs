@@ -49,8 +49,8 @@ export class PostsController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator ({ maxSize: 1000000}),
-          // new FileTypeValidator ({ fileType: "image/jpeg/jpg/png"})
+          new MaxFileSizeValidator ({ maxSize: 5000000}),
+          new FileTypeValidator ({ fileType: /image\/(jpeg|jpg|png)/})
         ],
         fileIsRequired: false
       })
